@@ -1,22 +1,20 @@
 package by.aermakova.fiftyusersloader.data.local
 
-import android.app.Application
 import by.aermakova.fiftyusersloader.data.model.local.User
 import io.reactivex.Single
+import javax.inject.Inject
 
-class UserLocalRepository(application: Application) {
-
-    val userLocalDB = UserLocalDataBase.getDatabase(application.applicationContext).usersDao()
+class UserLocalRepository @Inject constructor(private var localDB: UserLocalDataBase) {
 
     fun getAllUsers(): Single<List<User>> {
-        return userLocalDB.getAllUsers()
+        return localDB.usersDao().getAllUsers()
     }
 
     fun deleteAll() {
-        userLocalDB.deleteAll()
+        localDB.usersDao().deleteAll()
     }
 
     fun insertAll(users: List<User>) {
-        userLocalDB.insertAllUsers(users)
+        localDB.usersDao().insertAllUsers(users)
     }
 }

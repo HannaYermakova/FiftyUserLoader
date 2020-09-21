@@ -1,18 +1,17 @@
 package by.aermakova.fiftyusersloader.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.ViewModel
 import by.aermakova.fiftyusersloader.data.UserInteractor
 import by.aermakova.fiftyusersloader.data.model.local.User
 import io.reactivex.disposables.CompositeDisposable
 
-class UserListViewModel(application: Application) : AndroidViewModel(application) {
+class UserListViewModel @ViewModelInject constructor(private val userInteractor: UserInteractor) :
+    ViewModel() {
 
     init {
         loadOrUpdateUsers()
     }
-
-    private val userInteractor = UserInteractor(application)
 
     lateinit var userList: List<User>
 

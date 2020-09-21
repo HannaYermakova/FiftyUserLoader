@@ -1,17 +1,17 @@
 package by.aermakova.fiftyusersloader.data
 
-import android.app.Application
 import by.aermakova.fiftyusersloader.data.local.UserLocalRepository
 import by.aermakova.fiftyusersloader.data.model.UserConverter
 import by.aermakova.fiftyusersloader.data.model.local.User
 import by.aermakova.fiftyusersloader.data.remote.UserRemoteRepository
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class UserInteractor(application: Application) : UserConverter {
-
-    val localDB = UserLocalRepository(application)
-    val remoteDB = UserRemoteRepository
+class UserInteractor @Inject constructor(
+    private var localDB: UserLocalRepository,
+    private var remoteDB: UserRemoteRepository
+) : UserConverter {
 
     fun getUsers(update: Boolean): Single<List<User>> {
         return if (!update) {
