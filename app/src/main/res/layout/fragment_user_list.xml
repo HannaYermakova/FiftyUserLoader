@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="by.aermakova.fiftyusersloader.viewmodel.UserListViewModel" />
+            type="by.aermakova.fiftyusersloader.ui.userList.UserListViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

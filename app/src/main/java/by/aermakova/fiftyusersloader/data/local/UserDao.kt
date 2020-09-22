@@ -17,4 +17,7 @@ interface UserDao {
 
     @Query("DELETE FROM user_table")
     fun deleteAll()
+
+    @Query("SELECT * from user_table WHERE id = :id ")
+    fun getUserById(id: Int) : Single<User>
 }

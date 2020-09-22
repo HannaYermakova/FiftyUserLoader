@@ -21,6 +21,7 @@ import javax.inject.Singleton
 object AppModule {
 
     @Provides
+    @Singleton
     fun provideUserDao(
         localDB: UserLocalDataBase
     ): UserDao {
@@ -28,6 +29,7 @@ object AppModule {
     }
 
     @Provides
+    @Singleton
     fun provideUserInteractor(
         localDB: UserLocalRepository,
         remoteDB: UserRemoteRepository

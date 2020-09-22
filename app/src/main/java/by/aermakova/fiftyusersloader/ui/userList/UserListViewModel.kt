@@ -1,4 +1,4 @@
-package by.aermakova.fiftyusersloader.viewmodel
+package by.aermakova.fiftyusersloader.ui.userList
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel

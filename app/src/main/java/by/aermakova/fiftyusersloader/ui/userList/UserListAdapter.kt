@@ -1,5 +1,6 @@
-package by.aermakova.fiftyusersloader.ui
+package by.aermakova.fiftyusersloader.ui.userList
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -9,12 +10,18 @@ import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.data.model.local.User
 import by.aermakova.fiftyusersloader.databinding.UserItemBinding
 
-class UserListAdapter : RecyclerView.Adapter<UserListAdapter.UserViewHolder>() {
+class UserListAdapter(private val listener: OnSelectUserItem) :
+    RecyclerView.Adapter<UserListAdapter.UserViewHolder>() {
 
     private val usersList = arrayListOf<User>()
 
     fun update(items: List<User>) {
-        val diffResult = DiffUtil.calculateDiff(UserDiffUtil(usersList, items))
+        val diffResult = DiffUtil.calculateDiff(
+            UserDiffUtil(
+                usersList,
+                items
+            )
+        )
         setData(items)
         diffResult.dispatchUpdatesTo(this)
     }
@@ -28,13 +35,20 @@ class UserListAdapter : RecyclerView.Adapter<UserListAdapter.UserViewHolder>() {
         val inflater = LayoutInflater.from(parent.context)
         val binding: UserItemBinding =
             DataBindingUtil.inflate(inflater, R.layout.user_item, parent, false)
-        return UserViewHolder(binding)
+        return UserViewHolder(
+            binding
+        )
     }
 
     override fun getItemCount() = usersList.size
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        holder.binding.user = usersList[position]
+        val user = usersList[position]
+        holder.binding.user = user
+        holder.binding.root.setOnClickListener {
+            Log.i("UserListAdapter", "ID: ${user.id}")
+            listener.selectUser(user.id)
+        }
     }
 
     class UserViewHolder(val binding: UserItemBinding) : RecyclerView.ViewHolder(binding.root)

@@ -8,6 +8,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.data.model.local.Gender
 import by.aermakova.fiftyusersloader.data.model.local.User
+import by.aermakova.fiftyusersloader.ui.userList.UserListAdapter
 import com.bumptech.glide.Glide
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable

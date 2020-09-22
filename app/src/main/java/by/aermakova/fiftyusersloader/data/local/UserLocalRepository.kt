@@ -17,4 +17,8 @@ class UserLocalRepository @Inject constructor(private var userDao: UserDao) {
     fun insertAllUsers(users: List<User>) {
         userDao.insertAllUsers(users)
     }
+
+    fun getUserById(id: Int) : Single<User>{
+        return userDao.getUserById(id)
+    }
 }

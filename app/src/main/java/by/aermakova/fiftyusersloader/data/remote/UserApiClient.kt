@@ -2,14 +2,17 @@ package by.aermakova.fiftyusersloader.data.remote
 
 import android.util.Log
 import by.aermakova.fiftyusersloader.BuildConfig
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
+import okio.BufferedSink
+import okio.GzipSink
+import okio.Okio
+import okio.buffer
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
+
 
 class UserApiClient {
 
@@ -28,16 +31,25 @@ class UserApiClient {
 
     private fun getClient(): OkHttpClient {
 /*        val interceptor = HttpLoggingInterceptor()
-        interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS)*/
+        interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS)
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)*/
+        return OkHttpClient.Builder().addInterceptor(LoggingInterceptor()).build()
+    }
 
-        val inters = object : Interceptor{
-            override fun intercept(chain: Interceptor.Chain): Response {
-                val request: Request = chain.request()
-                Log.i("Logger", "Header: ${chain.request().headers}, Body: ${chain.request().body} ")
-                return chain.proceed(request)
-            }
+    class LoggingInterceptor : Interceptor {
+        @Throws(IOException::class)
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val request = chain.request()
+            Log.i(
+                "Logging request",
+                "Headers: ${request.headers}, Body: ${request.body.toString()}"
+            )
+            val response = chain.proceed(request)
+            Log.i(
+                "Logging response",
+                "Headers: ${response.headers}, Body: ${response.body.toString()}"
+            )
+            return response
         }
-
-       return OkHttpClient.Builder().addInterceptor(inters).build()
     }
 }

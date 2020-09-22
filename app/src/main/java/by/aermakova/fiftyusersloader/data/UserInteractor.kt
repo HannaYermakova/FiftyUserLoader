@@ -1,5 +1,6 @@
 package by.aermakova.fiftyusersloader.data
 
+import android.util.Log
 import by.aermakova.fiftyusersloader.data.local.UserLocalRepository
 import by.aermakova.fiftyusersloader.data.model.local.User
 import by.aermakova.fiftyusersloader.data.model.remote.toLocal
@@ -37,7 +38,13 @@ class UserInteractor @Inject constructor(
             }
             .doOnSuccess {
                 localDB.deleteAllUsers()
+                Log.i("UserInteractor", "Insert: $it")
                 localDB.insertAllUsers(it)
+                //TODO return value FROM local db!!!
             }
+    }
+
+    fun getUserById(currentUserId: Int): Single<User> {
+        return localDB.getUserById(currentUserId)
     }
 }
