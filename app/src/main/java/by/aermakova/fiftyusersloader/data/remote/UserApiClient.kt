@@ -2,16 +2,17 @@ package by.aermakova.fiftyusersloader.data.remote
 
 import android.util.Log
 import by.aermakova.fiftyusersloader.BuildConfig
-import okhttp3.*
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
-import okio.BufferedSink
-import okio.GzipSink
-import okio.Okio
-import okio.buffer
+import okio.Buffer
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 
 
 class UserApiClient {
@@ -30,24 +31,51 @@ class UserApiClient {
     }
 
     private fun getClient(): OkHttpClient {
-/*        val interceptor = HttpLoggingInterceptor()
-        interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS)
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)*/
-        return OkHttpClient.Builder().addInterceptor(LoggingInterceptor()).build()
+        val body = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
+            override fun log(message: String) {
+                Log.i("Body", message)
+            }
+        }).apply {
+            setLevel(HttpLoggingInterceptor.Level.BODY)
+        }
+        return OkHttpClient.Builder()
+            .addNetworkInterceptor(LoggerRequestInterceptor())
+            .addInterceptor(LoggerResponseInterceptor())
+            .build()
     }
 
-    class LoggingInterceptor : Interceptor {
+    class LoggerRequestInterceptor : Interceptor {
         @Throws(IOException::class)
         override fun intercept(chain: Interceptor.Chain): Response {
             val request = chain.request()
-            Log.i(
+            val buffer = Buffer()
+            request.body?.writeTo(buffer)
+            val body: String? = buffer.readUtf8()
+            Log.d(
                 "Logging request",
-                "Headers: ${request.headers}, Body: ${request.body.toString()}"
+                "Headers: ${request.headers}," +
+                        " Body: ${if (body.isNullOrBlank()) "null" else body}"
             )
+            return chain.proceed(request)
+        }
+    }
+
+    class LoggerResponseInterceptor : Interceptor {
+        @Throws(IOException::class)
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val request = chain.request()
             val response = chain.proceed(request)
-            Log.i(
+            val responseBody = response.body!!
+            val source = responseBody.source()
+            source.request(Long.MAX_VALUE)
+            val buffer = source.buffer
+            val contentType = responseBody.contentType()
+            val charset: Charset =
+                contentType?.charset(StandardCharsets.UTF_8) ?: StandardCharsets.UTF_8
+            Log.d(
                 "Logging response",
-                "Headers: ${response.headers}, Body: ${response.body.toString()}"
+                "Headers: ${response.headers}," +
+                        " Body: ${buffer.clone().readString(charset)}"
             )
             return response
         }
