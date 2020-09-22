@@ -27,9 +27,7 @@ object BindingAdapter {
         if (disposable != null && userList != null) {
             disposable.add(
                 userList.subscribe(
-                    {
-                        (recyclerView.adapter as UserListAdapter).update(it)
-                    },
+                    { (recyclerView.adapter as UserListAdapter).update(it) },
                     { it.printStackTrace() }
                 )
             )

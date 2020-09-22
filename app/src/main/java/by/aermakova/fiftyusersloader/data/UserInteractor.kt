@@ -1,8 +1,8 @@
 package by.aermakova.fiftyusersloader.data
 
 import by.aermakova.fiftyusersloader.data.local.UserLocalRepository
-import by.aermakova.fiftyusersloader.data.model.UserConverter
 import by.aermakova.fiftyusersloader.data.model.local.User
+import by.aermakova.fiftyusersloader.data.model.remote.toLocal
 import by.aermakova.fiftyusersloader.data.remote.UserRemoteRepository
 import io.reactivex.Single
 import javax.inject.Inject
@@ -10,7 +10,7 @@ import javax.inject.Inject
 class UserInteractor @Inject constructor(
     private var localDB: UserLocalRepository,
     private var remoteDB: UserRemoteRepository
-) : UserConverter {
+) {
 
     fun getUsers(refresh: Boolean): Single<List<User>> {
         return if (refresh) {
@@ -26,21 +26,18 @@ class UserInteractor @Inject constructor(
                 if (it.isEmpty()) {
                     loadUsersToLocalDB()
                 } else
-                    Single.just<List<User>>(it)
+                    Single.just(it)
             }
     }
 
     private fun loadUsersToLocalDB(): Single<List<User>> {
         return remoteDB.getAllUsers()
-            .flatMap { it ->
-                Single.create<List<User>> { emitter ->
-                    localDB.deleteAllUsers()
-                    val list = it.results.map { it.toLocal() }
-                    if (!emitter.isDisposed) {
-                        emitter.onSuccess(list)
-                        localDB.insertAllUsers(list)
-                    }
-                }
+            .map { it ->
+                it.results.map { it.toLocal() }
+            }
+            .doOnSuccess {
+                localDB.deleteAllUsers()
+                localDB.insertAllUsers(it)
             }
     }
 }
