@@ -5,7 +5,6 @@ import by.aermakova.fiftyusersloader.data.model.UserConverter
 import by.aermakova.fiftyusersloader.data.model.local.User
 import by.aermakova.fiftyusersloader.data.remote.UserRemoteRepository
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class UserInteractor @Inject constructor(
@@ -13,39 +12,33 @@ class UserInteractor @Inject constructor(
     private var remoteDB: UserRemoteRepository
 ) : UserConverter {
 
-    fun getUsers(update: Boolean): Single<List<User>> {
-        return if (!update) {
-            updateUsersInLocalDB()
+    fun getUsers(refresh: Boolean): Single<List<User>> {
+        return if (refresh) {
+            loadUsersToLocalDB()
         } else {
-            isLocalDBEmpty()
+            loadFromLocalOrRefresh()
         }
     }
 
-    private fun isLocalDBEmpty(): Single<List<User>> {
+    private fun loadFromLocalOrRefresh(): Single<List<User>> {
         return localDB.getAllUsers()
-            .subscribeOn(Schedulers.io())
             .flatMap {
-                Single.create<List<User>> { emitter ->
-                    if (it.isEmpty()) {
-                        updateUsersInLocalDB()
-                    } else {
-                        if (!emitter.isDisposed) {
-                            emitter.onSuccess(it)
-                        }
-                    }
-                }
+                if (it.isEmpty()) {
+                    loadUsersToLocalDB()
+                } else
+                    Single.just<List<User>>(it)
             }
     }
 
-    private fun updateUsersInLocalDB(): Single<List<User>> {
+    private fun loadUsersToLocalDB(): Single<List<User>> {
         return remoteDB.getAllUsers()
-            .subscribeOn(Schedulers.io())
             .flatMap { it ->
                 Single.create<List<User>> { emitter ->
-                    localDB.deleteAll()
+                    localDB.deleteAllUsers()
                     val list = it.results.map { it.toLocal() }
                     if (!emitter.isDisposed) {
                         emitter.onSuccess(list)
+                        localDB.insertAllUsers(list)
                     }
                 }
             }

@@ -13,12 +13,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/users_recycler_list"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_to_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:add_disposable="@{viewModel.disposable}"
-            app:add_userList="@{viewModel.userList}" />
+            app:is_refreshing="@{viewModel.refreshing}"
+            app:refresh="@{viewModel.load}">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/users_recycler_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:add_disposable="@{viewModel.disposable}"
+                app:add_userList="@{viewModel.userList}" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

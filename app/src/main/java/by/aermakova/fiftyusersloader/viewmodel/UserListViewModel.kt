@@ -4,33 +4,44 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import by.aermakova.fiftyusersloader.data.UserInteractor
 import by.aermakova.fiftyusersloader.data.model.local.User
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 
 class UserListViewModel @ViewModelInject constructor(private val userInteractor: UserInteractor) :
     ViewModel() {
 
-    init {
-        loadOrUpdateUsers()
-    }
+    private val _userList = BehaviorSubject.create<List<User>>()
+    val userList: Observable<List<User>>
+        get() = _userList.hide()
 
-    lateinit var userList: List<User>
+    private val _refreshing = BehaviorSubject.create<Boolean>()
+    val refreshing: Observable<Boolean>
+        get() = _refreshing.hide()
 
     private val _disposable = CompositeDisposable()
     val disposable: CompositeDisposable
         get() = _disposable
 
-    private fun loadUsers() =
-        userInteractor.getUsers(false)
+    init {
+        loadOrRefreshUsers(refresh = false)
+    }
 
-    private fun updateUsers() =
-        userInteractor.getUsers(true)
+    val load = { loadOrRefreshUsers(true) }
 
-    private fun loadOrUpdateUsers() {
+    private fun loadOrRefreshUsers(refresh: Boolean) {
         _disposable.add(
-            loadUsers()
+            userInteractor.getUsers(refresh)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     {
-                        userList = it
+                        _userList.onNext(it)
+                        if (refresh) {
+                            _refreshing.onNext(false)
+                        }
                     },
                     {
                         it.printStackTrace()
@@ -38,7 +49,6 @@ class UserListViewModel @ViewModelInject constructor(private val userInteractor:
                 )
         )
     }
-
 
     fun clearDisposable() {
         _disposable.clear()

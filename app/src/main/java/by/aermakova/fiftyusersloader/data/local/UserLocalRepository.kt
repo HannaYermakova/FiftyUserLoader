@@ -10,11 +10,11 @@ class UserLocalRepository @Inject constructor(private var localDB: UserLocalData
         return localDB.usersDao().getAllUsers()
     }
 
-    fun deleteAll() {
+    fun deleteAllUsers() {
         localDB.usersDao().deleteAll()
     }
 
-    fun insertAll(users: List<User>) {
+    fun insertAllUsers(users: List<User>) {
         localDB.usersDao().insertAllUsers(users)
     }
 }
