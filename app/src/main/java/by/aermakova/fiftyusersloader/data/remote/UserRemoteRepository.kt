@@ -6,9 +6,9 @@ import javax.inject.Inject
 
 const val INITIAL_NUMBER = 50
 
-class UserRemoteRepository @Inject constructor(private var userApiClient: UserApiClient) {
+class UserRemoteRepository @Inject constructor(private var userGeneratorApi: UserGeneratorApi) {
 
     fun getAllUsers(): Single<ListUser> {
-        return userApiClient.getUserApiService().getUsers(INITIAL_NUMBER)
+        return userGeneratorApi.getUsers(INITIAL_NUMBER)
     }
 }

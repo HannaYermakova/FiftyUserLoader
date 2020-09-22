@@ -3,6 +3,7 @@ package by.aermakova.fiftyusersloader.data.di
 import android.content.Context
 import androidx.room.Room
 import by.aermakova.fiftyusersloader.data.UserInteractor
+import by.aermakova.fiftyusersloader.data.local.UserDao
 import by.aermakova.fiftyusersloader.data.local.UserLocalDataBase
 import by.aermakova.fiftyusersloader.data.local.UserLocalRepository
 import by.aermakova.fiftyusersloader.data.remote.UserApiClient
@@ -20,6 +21,13 @@ import javax.inject.Singleton
 object AppModule {
 
     @Provides
+    fun provideUserDao(
+        localDB: UserLocalDataBase
+    ): UserDao {
+        return localDB.usersDao()
+    }
+
+    @Provides
     fun provideUserInteractor(
         localDB: UserLocalRepository,
         remoteDB: UserRemoteRepository
@@ -33,18 +41,22 @@ object AppModule {
         return UserApiClient()
     }
 
-
-
     @Singleton
     @Provides
-    fun provideUserRemoteRepository(userApiClient: UserApiClient): UserRemoteRepository {
-        return UserRemoteRepository(userApiClient)
+    fun provideUserGeneratorApi(userApiClient: UserApiClient): UserGeneratorApi {
+        return userApiClient.getUserApiService()
     }
 
     @Singleton
     @Provides
-    fun provideUserLocalRepository(localDB: UserLocalDataBase): UserLocalRepository {
-        return UserLocalRepository(localDB)
+    fun provideUserRemoteRepository(userGeneratorApi: UserGeneratorApi): UserRemoteRepository {
+        return UserRemoteRepository(userGeneratorApi)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUserLocalRepository(userDto: UserDao): UserLocalRepository {
+        return UserLocalRepository(userDto)
     }
 
     @Provides
@@ -53,7 +65,8 @@ object AppModule {
         return Room.databaseBuilder(
             appContext,
             UserLocalDataBase::class.java,
-            "user_table"
+            USER_TABLE_NAME
         ).build()
     }
+    const val USER_TABLE_NAME = "user_table"
 }
