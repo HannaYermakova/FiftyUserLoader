@@ -2,16 +2,14 @@ package by.aermakova.fiftyusersloader.util
 
 import android.content.Context
 import android.net.Uri
-import android.os.FileUtils
-import android.util.Log
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.BufferedInputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
+import okio.BufferedSink
+import java.io.*
 import java.net.URL
 import java.net.URLConnection
 
@@ -19,6 +17,7 @@ const val FOLDER_NAME = "temp"
 const val FILE_FIELD = "file"
 
 fun Context.downloadFile(path: String?, fileName: String, extension: String): Boolean {
+
     try {
         val url = URL(path)
         val urlConnection: URLConnection = url.openConnection().apply {
@@ -55,7 +54,7 @@ fun createFile(dir: String, folder: String, fileTitle: String): File {
 
 private fun deleteFolder(dir: String, folder: String): Boolean {
     val directory = File(dir, folder)
-        deleteRecursive(directory)
+    deleteRecursive(directory)
     return directory.delete()
 }
 
@@ -65,11 +64,11 @@ fun deleteRecursive(fileOrDirectory: File) {
             deleteRecursive(child)
         }
     }
-   fileOrDirectory.delete()
+    fileOrDirectory.delete()
 }
 
-fun Context.deletePhotoFolder() : Boolean{
-  return  deleteFolder(filesDir.path, FOLDER_NAME)
+fun Context.deletePhotoFolder(): Boolean {
+    return deleteFolder(filesDir.path, FOLDER_NAME)
 }
 
 fun Context.fileIsSaved(fileName: String, extension: String): Boolean {
@@ -77,10 +76,59 @@ fun Context.fileIsSaved(fileName: String, extension: String): Boolean {
     return file.exists()
 }
 
-fun Context.prepareFilePart(fileName: String, extension: String): MultipartBody.Part {
+fun prepareFilePart(fileName: String, requestBody: RequestBody): MultipartBody.Part {
+    return MultipartBody.Part.createFormData(FILE_FIELD, fileName, requestBody)
+}
+
+fun Context.getRequestBody(fileName: String, extension: String): ProgressRequest {
     val file = createFile(filesDir.path, FOLDER_NAME, "$fileName.$extension")
     val uri = Uri.fromFile(file)
-    val requestFile: RequestBody =file.asRequestBody(contentResolver.getType(uri)?.toMediaTypeOrNull())
+    return ProgressRequest(context = this, uri = uri, file = file)
+}
 
-    return MultipartBody.Part.createFormData(FILE_FIELD, file.name, requestFile)
+class ProgressRequest(
+    private val context: Context,
+    private val uri: Uri,
+    private val file: File
+) : RequestBody() {
+
+    companion object {
+        const val DEFAULT_BUFFER_SIZE = 2048
+    }
+
+    private val _progressSubject = PublishSubject.create<Float>()
+    val progressSubject: Observable<Float>
+        get() = _progressSubject
+
+    override fun contentType(): MediaType? {
+        return context.contentResolver.getType(uri)?.toMediaTypeOrNull()
+    }
+
+    var numWrite = 0
+
+    override fun writeTo(sink: BufferedSink) {
+        numWrite++
+        val fileLength = file.length()
+        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+        val inputStream = FileInputStream(file)
+        var uploaded: Long = 0
+
+        inputStream.use { stream ->
+            var read: Int
+            var lastProgress = 0.0f
+            read = stream.read(buffer)
+            while (read != -1) {
+                uploaded += read.toLong()
+                sink.write(buffer, 0, read)
+                read = stream.read(buffer)
+                if (numWrite < 2) {
+                    val progress = (uploaded.toFloat() / fileLength.toFloat()) * 100f
+                    if (progress - lastProgress > 1 || progress == 100f) {
+                        _progressSubject.onNext(progress)
+                        lastProgress = progress
+                    }
+                }
+            }
+        }
+    }
 }

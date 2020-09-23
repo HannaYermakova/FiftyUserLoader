@@ -10,8 +10,8 @@ import javax.inject.Inject
 const val INITIAL_NUMBER = 50
 
 class UserRemoteRepository @Inject constructor(
-    private var userGeneratorApi: UserGeneratorApi,
-    private var fileUploadApi: FileUploadApi
+    private val userGeneratorApi: UserGeneratorApi,
+    private val fileUploadApi: FileUploadApi
 ) {
 
     fun getAllUsers(): Single<ListUser> {

@@ -14,7 +14,7 @@ object GenderConverter {
     @JvmStatic
     fun convertStringToGender(gender: String): Gender {
         return when (gender) {
-            "female" -> Gender.FEMALE
+            Gender.FEMALE.gender -> Gender.FEMALE
             else -> Gender.MALE
         }
     }

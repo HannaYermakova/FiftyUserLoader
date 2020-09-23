@@ -1,6 +1,7 @@
 package by.aermakova.fiftyusersloader.ui.user
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,6 +11,7 @@ import by.aermakova.fiftyusersloader.data.UserInteractor
 import by.aermakova.fiftyusersloader.data.model.local.User
 import by.aermakova.fiftyusersloader.util.downloadFile
 import by.aermakova.fiftyusersloader.util.fileIsSaved
+import by.aermakova.fiftyusersloader.util.getRequestBody
 import by.aermakova.fiftyusersloader.util.prepareFilePart
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -110,10 +112,17 @@ class UserViewModel @ViewModelInject constructor(
         val currentUser = user.value
         if (currentUser != null) {
             with(currentUser) {
+                val body = appContext.getRequestBody(login, imageExtension)
                 disposable.add(
-                    userInteractor.uploadFile(
-                        appContext.prepareFilePart(login, imageExtension)
-                    )
+                    body.progressSubject.subscribeOn(Schedulers.io())
+                        .subscribe(
+                            { Log.i("UserViewModel", it.toString()) },
+                            { it.printStackTrace() }
+                        )
+                )
+
+                disposable.add(
+                    userInteractor.uploadFile(prepareFilePart(login, body))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(

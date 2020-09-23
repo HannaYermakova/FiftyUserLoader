@@ -2,7 +2,10 @@ package by.aermakova.fiftyusersloader.data.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import by.aermakova.fiftyusersloader.data.UserInteractor
+import by.aermakova.fiftyusersloader.data.local.USER_TABLE_NAME
 import by.aermakova.fiftyusersloader.data.local.UserDao
 import by.aermakova.fiftyusersloader.data.local.UserLocalDataBase
 import by.aermakova.fiftyusersloader.data.local.UserLocalRepository
@@ -61,7 +64,10 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideUserRemoteRepository(userGeneratorApi: UserGeneratorApi, fileUploadApi: FileUploadApi): UserRemoteRepository {
+    fun provideUserRemoteRepository(
+        userGeneratorApi: UserGeneratorApi,
+        fileUploadApi: FileUploadApi
+    ): UserRemoteRepository {
         return UserRemoteRepository(userGeneratorApi, fileUploadApi)
     }
 
@@ -84,8 +90,13 @@ object AppModule {
             appContext,
             UserLocalDataBase::class.java,
             USER_TABLE_NAME
-        ).build()
+        ).addMigrations(MIGRATION_1_2)
+            .build()
     }
+}
 
-    const val USER_TABLE_NAME = "user_table"
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE user_table ADD COLUMN version INTEGER")
+    }
 }
