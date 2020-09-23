@@ -31,13 +31,6 @@ class UserApiClient {
     }
 
     private fun getClient(): OkHttpClient {
-        val body = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
-            override fun log(message: String) {
-                Log.i("Body", message)
-            }
-        }).apply {
-            setLevel(HttpLoggingInterceptor.Level.BODY)
-        }
         return OkHttpClient.Builder()
             .addNetworkInterceptor(LoggerRequestInterceptor())
             .addInterceptor(LoggerResponseInterceptor())

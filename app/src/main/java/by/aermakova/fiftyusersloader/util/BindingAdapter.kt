@@ -1,5 +1,7 @@
-package by.aermakova.fiftyusersloader.ui
+package by.aermakova.fiftyusersloader.util
 
+import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
@@ -14,6 +16,14 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 
 object BindingAdapter {
+
+    @BindingAdapter("app:click")
+    @JvmStatic
+    fun saveFile(view: Button, function: () -> Unit) {
+        view.setOnClickListener {
+            function.invoke()
+        }
+    }
 
     @BindingAdapter(
         "app:add_disposable",
@@ -55,13 +65,43 @@ object BindingAdapter {
         }
     }
 
-    @BindingAdapter("app:load_url")
+    @BindingAdapter(
+        "app:add_disposable",
+        "app:upload_enabled"
+    )
+    @JvmStatic
+    fun uploadIsEnabled(
+        view: Button,
+        disposable: CompositeDisposable?,
+        uploading: Observable<Boolean>?
+    ) {
+        if (uploading != null && disposable != null) {
+            disposable.add(
+                uploading.subscribe(
+                    { view.visibility = if (it) View.VISIBLE else View.GONE },
+                    { it.printStackTrace() }
+                )
+            )
+        }
+    }
+
+    @BindingAdapter("app:load_circle_image")
+    @JvmStatic
+    fun loadCircleImage(view: ImageView, url: String?) {
+        if (url != null) {
+            Glide.with(view.context)
+                .load(url)
+                .circleCrop()
+                .into(view)
+        }
+    }
+
+    @BindingAdapter("app:load_image")
     @JvmStatic
     fun loadImage(view: ImageView, url: String?) {
         if (url != null) {
             Glide.with(view.context)
                 .load(url)
-                .circleCrop()
                 .into(view)
         }
     }

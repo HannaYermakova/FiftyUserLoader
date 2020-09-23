@@ -62,7 +62,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:load_url="@{user.picture}"
+            app:load_circle_image="@{user.picture}"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView

@@ -16,14 +16,58 @@
         tools:context=".ui.user.UserFragment">
 
         <TextView
+            android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{viewModel.user.name}"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/name_text_size"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.1"
             tools:text="John Doe" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="@dimen/photo_size"
+            android:layout_height="@dimen/photo_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintVertical_bias="0.1"
+            app:load_image="@{viewModel.user.picture}"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            app:click="@{viewModel.saveFile}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView"
+            app:layout_constraintVertical_bias="0.2" />
+
+        <Button
+            android:id="@+id/upload_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/upload"
+            app:click="@{viewModel.upload}"
+            app:upload_enabled="@{viewModel.pictureIsSaved}"
+            app:add_disposable="@{viewModel.disposable}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/save_button"
+            app:layout_constraintVertical_bias="0.1"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

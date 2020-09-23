@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">FiftyUsersLoader</string>
     <string name="gender">Gender</string>
+    <string name="upload">upload</string>
+    <string name="save">save</string>
+    <string name="file_downloaded">"File "%1$s" is downloaded"</string>
+    <string name="file_uploaded">"File "%1$s" is uploaded"</string>
 </resources>

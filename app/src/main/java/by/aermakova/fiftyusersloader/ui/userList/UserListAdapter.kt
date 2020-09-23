@@ -1,6 +1,5 @@
 package by.aermakova.fiftyusersloader.ui.userList
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -46,7 +45,6 @@ class UserListAdapter(private val listener: OnSelectUserItem) :
         val user = usersList[position]
         holder.binding.user = user
         holder.binding.root.setOnClickListener {
-            Log.i("UserListAdapter", "ID: ${user.id}")
             listener.selectUser(user.id)
         }
     }

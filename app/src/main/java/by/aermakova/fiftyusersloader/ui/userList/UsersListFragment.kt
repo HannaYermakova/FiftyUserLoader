@@ -49,13 +49,7 @@ class UsersListFragment : Fragment(), OnSelectUserItem {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        viewModel.clearDisposable()
-    }
-
     override fun selectUser(id: Int) {
-        Log.i("UsersListFragment", "ID $id")
         val args = Bundle().apply { putInt(SELECTED_USER, id) }
         val fragment = UserFragment().apply { arguments = args }
         requireActivity()
@@ -64,6 +58,11 @@ class UsersListFragment : Fragment(), OnSelectUserItem {
             .replace(R.id.frame, fragment)
             .addToBackStack(null)
             .commit()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.clearDisposable()
     }
 }
 

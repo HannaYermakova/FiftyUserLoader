@@ -20,6 +20,7 @@ fun UserDto.toLocal(): User {
         email = email,
         login = login.username,
         phone = phone,
-        picture = picture.medium
+        picture = picture.large,
+        imageExtension = picture.large.split('.').last()
     )
 }

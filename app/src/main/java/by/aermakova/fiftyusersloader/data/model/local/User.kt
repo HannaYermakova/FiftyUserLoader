@@ -10,11 +10,12 @@ import by.aermakova.fiftyusersloader.data.di.AppModule
 data class User(
 
     @PrimaryKey(autoGenerate = true)
-    val id:Int = 0,
+    val id: Int = 0,
     val gender: Gender,
     val name: String,
     val email: String,
     val login: String,
     val phone: String,
-    val picture: String
+    val picture: String,
+    val imageExtension: String
 )

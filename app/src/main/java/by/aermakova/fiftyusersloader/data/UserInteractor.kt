@@ -6,6 +6,7 @@ import by.aermakova.fiftyusersloader.data.model.local.User
 import by.aermakova.fiftyusersloader.data.model.remote.toLocal
 import by.aermakova.fiftyusersloader.data.remote.UserRemoteRepository
 import io.reactivex.Single
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 class UserInteractor @Inject constructor(
@@ -38,13 +39,15 @@ class UserInteractor @Inject constructor(
             }
             .doOnSuccess {
                 localDB.deleteAllUsers()
-                Log.i("UserInteractor", "Insert: $it")
                 localDB.insertAllUsers(it)
-                //TODO return value FROM local db!!!
+            }.flatMap {
+                localDB.getAllUsers()
             }
     }
 
-    fun getUserById(currentUserId: Int): Single<User> {
-        return localDB.getUserById(currentUserId)
-    }
+    fun getUserById(currentUserId: Int) =
+        localDB.getUserById(currentUserId)
+
+    fun uploadFile(file: MultipartBody.Part)
+            = remoteDB.uploadFile(file)
 }

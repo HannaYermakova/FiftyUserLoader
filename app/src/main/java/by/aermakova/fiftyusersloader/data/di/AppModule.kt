@@ -6,9 +6,7 @@ import by.aermakova.fiftyusersloader.data.UserInteractor
 import by.aermakova.fiftyusersloader.data.local.UserDao
 import by.aermakova.fiftyusersloader.data.local.UserLocalDataBase
 import by.aermakova.fiftyusersloader.data.local.UserLocalRepository
-import by.aermakova.fiftyusersloader.data.remote.UserApiClient
-import by.aermakova.fiftyusersloader.data.remote.UserGeneratorApi
-import by.aermakova.fiftyusersloader.data.remote.UserRemoteRepository
+import by.aermakova.fiftyusersloader.data.remote.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,20 +43,38 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideFileIoClient(): FileIoClient {
+        return FileIoClient()
+    }
+
+    @Singleton
+    @Provides
+    fun provideFileUploadApi(fileIoClient: FileIoClient): FileUploadApi {
+        return fileIoClient.getFileUploadApi()
+    }
+
+    @Singleton
+    @Provides
     fun provideUserGeneratorApi(userApiClient: UserApiClient): UserGeneratorApi {
         return userApiClient.getUserApiService()
     }
 
     @Singleton
     @Provides
-    fun provideUserRemoteRepository(userGeneratorApi: UserGeneratorApi): UserRemoteRepository {
-        return UserRemoteRepository(userGeneratorApi)
+    fun provideUserRemoteRepository(userGeneratorApi: UserGeneratorApi, fileUploadApi: FileUploadApi): UserRemoteRepository {
+        return UserRemoteRepository(userGeneratorApi, fileUploadApi)
     }
 
     @Singleton
     @Provides
     fun provideUserLocalRepository(userDto: UserDao): UserLocalRepository {
         return UserLocalRepository(userDto)
+    }
+
+    @Provides
+    @Singleton
+    fun providesApplication(@ApplicationContext appContext: Context): Context {
+        return appContext
     }
 
     @Provides
@@ -70,5 +86,6 @@ object AppModule {
             USER_TABLE_NAME
         ).build()
     }
+
     const val USER_TABLE_NAME = "user_table"
 }
