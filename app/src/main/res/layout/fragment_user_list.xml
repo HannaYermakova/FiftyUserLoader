@@ -9,24 +9,65 @@
             type="by.aermakova.fiftyusersloader.ui.userList.UserListViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_to_refresh"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/content_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:add_disposable="@{viewModel.disposable}"
-            app:is_refreshing="@{viewModel.refreshing}"
-            app:refresh="@{viewModel.load}">
+            app:is_content="@{true}"
+            app:visibility="@{viewModel.loadingStatus}">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/users_recycler_list"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipe_to_refresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:add_disposable="@{viewModel.disposable}"
-                app:add_userList="@{viewModel.userList}" />
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                app:is_refreshing="@{viewModel.refreshing}"
+                app:refresh="@{viewModel.load}">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/users_recycler_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:add_disposable="@{viewModel.disposable}"
+                    app:add_userList="@{viewModel.userList}" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/placeholder_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:add_disposable="@{viewModel.disposable}"
+            app:is_content="@{false}"
+            app:visibility="@{viewModel.loadingStatus}">
+
+                <TextView
+                    android:id="@+id/error_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/error_message"
+                    app:add_disposable="@{viewModel.disposable}"
+                    app:error_visibility="@{viewModel.loadingStatus}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.2" />
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:add_disposable="@{viewModel.disposable}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:progress_visibility="@{viewModel.loadingStatus}" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 </layout>

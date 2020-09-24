@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +13,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.data.model.local.Gender
 import by.aermakova.fiftyusersloader.data.model.local.User
+import by.aermakova.fiftyusersloader.ui.userList.LoadingStatus
 import by.aermakova.fiftyusersloader.ui.userList.UserListAdapter
 import com.bumptech.glide.Glide
 import io.reactivex.Observable
@@ -29,6 +31,86 @@ object BindingAdapter {
 
     @BindingAdapter(
         "app:add_disposable",
+        "app:visibility",
+        "app:is_content"
+    )
+    @JvmStatic
+    fun setPlaceHolderVisibility(
+        layout: View,
+        disposable: CompositeDisposable?,
+        loadingStatus: Observable<LoadingStatus>?,
+        isContent: Boolean?
+    ) {
+        if (disposable != null && loadingStatus != null && isContent != null) {
+            disposable.add(
+                loadingStatus.subscribe(
+                    {
+                        layout.visibility = when (it) {
+                            is LoadingStatus.Loading -> if (isContent) View.GONE else View.VISIBLE
+                            is LoadingStatus.Success -> if (isContent) View.VISIBLE else View.GONE
+                            is LoadingStatus.Error -> if (isContent) View.GONE else View.VISIBLE
+                        }
+                    },
+                    { it.printStackTrace() }
+                )
+            )
+        }
+    }
+
+    @BindingAdapter(
+        "app:add_disposable",
+        "app:progress_visibility"
+    )
+    @JvmStatic
+    fun setProgressBarVisibility(
+        progressBar: ProgressBar,
+        disposable: CompositeDisposable?,
+        loadingStatus: Observable<LoadingStatus>?
+    ) {
+        if (disposable != null && loadingStatus != null) {
+            disposable.add(
+                loadingStatus.subscribe(
+                    {
+                        progressBar.visibility = when (it) {
+                            is LoadingStatus.Loading -> View.VISIBLE
+                            is LoadingStatus.Success -> View.GONE
+                            is LoadingStatus.Error -> View.GONE
+                        }
+                    },
+                    { it.printStackTrace() }
+                )
+            )
+        }
+    }
+
+    @BindingAdapter(
+        "app:add_disposable",
+        "app:error_visibility"
+    )
+    @JvmStatic
+    fun setErrorMessageVisibility(
+        errorMessage: View,
+        disposable: CompositeDisposable?,
+        loadingStatus: Observable<LoadingStatus>?
+    ) {
+        if (disposable != null && loadingStatus != null) {
+            disposable.add(
+                loadingStatus.subscribe(
+                    {
+                        errorMessage.visibility = when (it) {
+                            is LoadingStatus.Loading -> View.GONE
+                            is LoadingStatus.Success -> View.GONE
+                            is LoadingStatus.Error -> View.VISIBLE
+                        }
+                    },
+                    { it.printStackTrace() }
+                )
+            )
+        }
+    }
+
+    @BindingAdapter(
+        "app:add_disposable",
         "app:add_userList"
     )
     @JvmStatic
@@ -40,9 +122,7 @@ object BindingAdapter {
         if (disposable != null && userList != null) {
             disposable.add(
                 userList.subscribe(
-                    {
-                        Log.i("BindingAdapter", "list${it.size}")
-                        (recyclerView.adapter as UserListAdapter).update(it) },
+                    { (recyclerView.adapter as UserListAdapter).update(it) },
                     { it.printStackTrace() }
                 )
             )

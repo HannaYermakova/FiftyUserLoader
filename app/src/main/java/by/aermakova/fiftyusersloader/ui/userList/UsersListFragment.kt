@@ -35,7 +35,6 @@ class UsersListFragment : Fragment(), OnSelectUserItem {
 
     override fun onResume() {
         super.onResume()
-        Log.i("UsersListFragment", "on resume ")
         setUserAdapter()
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
@@ -59,7 +58,6 @@ class UsersListFragment : Fragment(), OnSelectUserItem {
     override fun onDestroyView() {
         super.onDestroyView()
         disposable.clear()
-//        viewModel.clearDisposable()
     }
 
     override fun selectUser(id: Int) {

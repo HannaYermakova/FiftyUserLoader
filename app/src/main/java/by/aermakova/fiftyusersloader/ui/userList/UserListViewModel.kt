@@ -13,6 +13,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 
 class UserListViewModel @ViewModelInject constructor(
     private val userInteractor: UserInteractor,
@@ -28,12 +29,15 @@ class UserListViewModel @ViewModelInject constructor(
     val refreshing: Observable<Boolean>
         get() = _refreshing.hide()
 
+    private val _loadingStatus = BehaviorSubject.create<LoadingStatus>()
+    val loadingStatus: Observable<LoadingStatus>
+        get() = _loadingStatus.hide()
+
     private val _disposable = CompositeDisposable()
     val disposable: CompositeDisposable
         get() = _disposable
 
     init {
-        Log.i("UserListViewModel", "init")
         loadOrRefreshUsers(false)
     }
 
@@ -52,6 +56,7 @@ class UserListViewModel @ViewModelInject constructor(
     }
 
     private fun loadOrRefreshUsers(refresh: Boolean) {
+        _loadingStatus.onNext(LoadingStatus.Loading)
         _disposable.add(
             userInteractor.getUsers(refresh)
                 .subscribeOn(Schedulers.io())
@@ -59,12 +64,14 @@ class UserListViewModel @ViewModelInject constructor(
                 .subscribe(
                     {
                         _userList.onNext(it)
+                        _loadingStatus.onNext(LoadingStatus.Success)
                         if (refresh) {
                             _refreshing.onNext(false)
                         }
                     },
                     {
                         it.printStackTrace()
+                        _loadingStatus.onNext(LoadingStatus.Error)
                     }
                 )
         )
@@ -74,8 +81,4 @@ class UserListViewModel @ViewModelInject constructor(
         super.onCleared()
         _disposable.clear()
     }
-
-/*    fun clearDisposable() {
-
-    }*/
 }
