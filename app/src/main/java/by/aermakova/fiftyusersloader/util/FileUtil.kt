@@ -80,8 +80,8 @@ fun prepareFilePart(fileName: String, requestBody: RequestBody): MultipartBody.P
     return MultipartBody.Part.createFormData(FILE_FIELD, fileName, requestBody)
 }
 
-fun Context.getRequestBody(fileName: String, extension: String): ProgressRequest {
-    val file = createFile(filesDir.path, FOLDER_NAME, "$fileName.$extension")
+fun Context.getRequestBody(fileName: String): ProgressRequest {
+    val file = createFile(filesDir.path, FOLDER_NAME, fileName)
     val uri = Uri.fromFile(file)
     return ProgressRequest(context = this, uri = uri, file = file)
 }

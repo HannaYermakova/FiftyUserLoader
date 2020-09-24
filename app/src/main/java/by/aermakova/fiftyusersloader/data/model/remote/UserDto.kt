@@ -21,6 +21,6 @@ fun UserDto.toLocal(): User {
         login = login.username,
         phone = phone,
         picture = picture.large,
-        imageExtension = picture.large.split('.').last()
+        imageExtension = /*picture.large.split('.').last()*/"pdf"
     )
 }

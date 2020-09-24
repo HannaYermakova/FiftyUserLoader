@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.databinding.FragmentUserListBinding
-import by.aermakova.fiftyusersloader.ui.user.SELECTED_USER
-import by.aermakova.fiftyusersloader.ui.user.UserFragment
+import by.aermakova.fiftyusersloader.ui.SelectUserListener
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.disposables.CompositeDisposable
 
 @AndroidEntryPoint
 class UsersListFragment : Fragment(), OnSelectUserItem {
@@ -22,6 +22,7 @@ class UsersListFragment : Fragment(), OnSelectUserItem {
     private val viewModel: UserListViewModel by viewModels()
     private lateinit var binding: FragmentUserListBinding
     private lateinit var userAdapter: UserListAdapter
+    private val disposable = CompositeDisposable()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,13 +30,19 @@ class UsersListFragment : Fragment(), OnSelectUserItem {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_user_list, container, false)
-        setUserAdapter()
-        binding.viewModel = viewModel
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.i("UsersListFragment", "on resume ")
+        setUserAdapter()
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+    }
+
     private fun setUserAdapter() {
-        userAdapter = UserListAdapter(this)
+        userAdapter = UserListAdapter(disposable, this)
         with(binding.usersRecyclerList) {
             adapter = userAdapter
             val manager = LinearLayoutManager(requireContext())
@@ -49,20 +56,14 @@ class UsersListFragment : Fragment(), OnSelectUserItem {
         }
     }
 
-    override fun selectUser(id: Int) {
-        val args = Bundle().apply { putInt(SELECTED_USER, id) }
-        val fragment = UserFragment().apply { arguments = args }
-        requireActivity()
-            .supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.frame, fragment)
-            .addToBackStack(null)
-            .commit()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.clearDisposable()
+        disposable.clear()
+//        viewModel.clearDisposable()
+    }
+
+    override fun selectUser(id: Int) {
+        (activity as? SelectUserListener)?.selectUser(id)
     }
 }
 

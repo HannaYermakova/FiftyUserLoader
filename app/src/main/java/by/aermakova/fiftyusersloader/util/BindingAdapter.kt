@@ -1,8 +1,10 @@
 package by.aermakova.fiftyusersloader.util
 
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -38,7 +40,9 @@ object BindingAdapter {
         if (disposable != null && userList != null) {
             disposable.add(
                 userList.subscribe(
-                    { (recyclerView.adapter as UserListAdapter).update(it) },
+                    {
+                        Log.i("BindingAdapter", "list${it.size}")
+                        (recyclerView.adapter as UserListAdapter).update(it) },
                     { it.printStackTrace() }
                 )
             )
@@ -71,7 +75,7 @@ object BindingAdapter {
     )
     @JvmStatic
     fun uploadIsEnabled(
-        view: Button,
+        view: View,
         disposable: CompositeDisposable?,
         uploading: Observable<Boolean>?
     ) {
@@ -125,6 +129,30 @@ object BindingAdapter {
     fun refreshUsers(view: SwipeRefreshLayout, refresh: () -> Unit) {
         view.setOnRefreshListener {
             refresh.invoke()
+        }
+    }
+
+    @BindingAdapter(
+        "app:add_disposable",
+        "app:custom_progress"
+    )
+    @JvmStatic
+    fun setCustomProgress(
+        progressBar: ProgressBar,
+        disposable: CompositeDisposable?,
+        uploading: Observable<Int>?
+    ) {
+        if (uploading != null && disposable != null) {
+            disposable.add(
+                uploading.subscribe(
+                    {
+                        progressBar.visibility = if (it in 1..99) View.VISIBLE
+                        else View.GONE
+                        progressBar.progress = it.toInt()
+                    },
+                    { it.printStackTrace() }
+                )
+            )
         }
     }
 }

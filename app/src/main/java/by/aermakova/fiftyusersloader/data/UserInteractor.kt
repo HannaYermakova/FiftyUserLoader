@@ -1,6 +1,5 @@
 package by.aermakova.fiftyusersloader.data
 
-import android.util.Log
 import by.aermakova.fiftyusersloader.data.local.UserLocalRepository
 import by.aermakova.fiftyusersloader.data.model.local.User
 import by.aermakova.fiftyusersloader.data.model.remote.toLocal

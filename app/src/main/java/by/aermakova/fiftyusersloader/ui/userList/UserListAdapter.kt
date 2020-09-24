@@ -8,21 +8,44 @@ import androidx.recyclerview.widget.RecyclerView
 import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.data.model.local.User
 import by.aermakova.fiftyusersloader.databinding.UserItemBinding
+import io.reactivex.Scheduler
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 
-class UserListAdapter(private val listener: OnSelectUserItem) :
+class UserListAdapter(
+    private val disposable: CompositeDisposable,
+    private val listener: OnSelectUserItem
+) :
     RecyclerView.Adapter<UserListAdapter.UserViewHolder>() {
 
     private val usersList = arrayListOf<User>()
 
     fun update(items: List<User>) {
-        val diffResult = DiffUtil.calculateDiff(
-            UserDiffUtil(
-                usersList,
-                items
-            )
+       disposable.add(
+            Single.create<DiffUtil.DiffResult> {
+                val diffResult = DiffUtil.calculateDiff(
+                    UserDiffUtil(usersList, items)
+                )
+                if (!it.isDisposed) {
+                    it.onSuccess(diffResult)
+                }
+            }
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    {
+                        setData(items)
+                        it.dispatchUpdatesTo(this)
+                    },
+                    {
+                        it.printStackTrace()
+                        setData(items)
+                        notifyDataSetChanged()
+                    })
         )
-        setData(items)
-        diffResult.dispatchUpdatesTo(this)
     }
 
     private fun setData(users: List<User>) {
@@ -34,9 +57,7 @@ class UserListAdapter(private val listener: OnSelectUserItem) :
         val inflater = LayoutInflater.from(parent.context)
         val binding: UserItemBinding =
             DataBindingUtil.inflate(inflater, R.layout.user_item, parent, false)
-        return UserViewHolder(
-            binding
-        )
+        return UserViewHolder(binding)
     }
 
     override fun getItemCount() = usersList.size

@@ -17,6 +17,5 @@ data class User(
     val login: String,
     val phone: String,
     val picture: String,
-    val imageExtension: String,
-    val version: Int = 2
+    val imageExtension: String
 )

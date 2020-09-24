@@ -1,6 +1,7 @@
 package by.aermakova.fiftyusersloader.ui.userList
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import by.aermakova.fiftyusersloader.data.UserInteractor
@@ -32,6 +33,7 @@ class UserListViewModel @ViewModelInject constructor(
         get() = _disposable
 
     init {
+        Log.i("UserListViewModel", "init")
         loadOrRefreshUsers(false)
     }
 
@@ -39,7 +41,9 @@ class UserListViewModel @ViewModelInject constructor(
         _disposable.add(
             Single.create<Boolean> {
                 val value = appContext.deletePhotoFolder()
-                it.onSuccess(value)
+                if (!it.isDisposed) {
+                    it.onSuccess(value)
+                }
             }
                 .subscribeOn(Schedulers.io())
                 .subscribe({}, { it.printStackTrace() })
@@ -66,7 +70,12 @@ class UserListViewModel @ViewModelInject constructor(
         )
     }
 
-    fun clearDisposable() {
+    override fun onCleared() {
+        super.onCleared()
         _disposable.clear()
     }
+
+/*    fun clearDisposable() {
+
+    }*/
 }
