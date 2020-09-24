@@ -12,10 +12,10 @@ import androidx.lifecycle.ViewModel
 import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.data.UserInteractor
 import by.aermakova.fiftyusersloader.data.model.local.User
-import by.aermakova.fiftyusersloader.ui.DEF_USER_ID
-import by.aermakova.fiftyusersloader.ui.uploading.UploadingService
-import by.aermakova.fiftyusersloader.ui.uploading.UploadingService.Companion.FILE_TITLE
-import by.aermakova.fiftyusersloader.ui.uploading.UploadingService.Companion.USER_ID
+import by.aermakova.fiftyusersloader.ui.main.DEF_USER_ID
+import by.aermakova.fiftyusersloader.ui.uploading.UploadService
+import by.aermakova.fiftyusersloader.ui.uploading.UploadService.Companion.FILE_TITLE
+import by.aermakova.fiftyusersloader.ui.uploading.UploadService.Companion.USER_ID
 import by.aermakova.fiftyusersloader.util.downloadFile
 import by.aermakova.fiftyusersloader.util.fileIsSaved
 import io.reactivex.Observable
@@ -136,7 +136,7 @@ class UserViewModel @ViewModelInject constructor(
         val currentUser = user.value
         if (currentUser != null) {
             with(currentUser) {
-                val intent = Intent(appContext, UploadingService::class.java).apply {
+                val intent = Intent(appContext, UploadService::class.java).apply {
                     putExtra(FILE_TITLE, "$login.$imageExtension")
                     putExtra(USER_ID, id)
                 }

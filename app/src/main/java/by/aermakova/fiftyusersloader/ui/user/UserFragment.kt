@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.databinding.FragmentUserBinding
-import by.aermakova.fiftyusersloader.ui.DEF_USER_ID
+import by.aermakova.fiftyusersloader.ui.main.DEF_USER_ID
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposables
 
@@ -38,7 +38,9 @@ class UserFragment : Fragment() {
     }
 
     private fun setUser() {
-        val id = arguments?.getInt(SELECTED_USER, DEF_USER_ID) ?: DEF_USER_ID
+        val id = arguments?.getInt(SELECTED_USER,
+            DEF_USER_ID
+        ) ?: DEF_USER_ID
         if (id > DEF_USER_ID) {
             viewModel.currentUserId = id
         }

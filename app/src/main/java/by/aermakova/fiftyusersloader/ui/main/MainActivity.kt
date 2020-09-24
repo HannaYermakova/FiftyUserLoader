@@ -1,9 +1,9 @@
-package by.aermakova.fiftyusersloader.ui
+package by.aermakova.fiftyusersloader.ui.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import by.aermakova.fiftyusersloader.R
-import by.aermakova.fiftyusersloader.ui.uploading.UploadingService
+import by.aermakova.fiftyusersloader.ui.uploading.UploadService
 import by.aermakova.fiftyusersloader.ui.user.UserFragment
 import by.aermakova.fiftyusersloader.ui.user.UserFragment.Companion.SELECTED_USER
 import by.aermakova.fiftyusersloader.ui.userList.UsersListFragment
@@ -12,7 +12,8 @@ import dagger.hilt.android.AndroidEntryPoint
 const val DEF_USER_ID = -1
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), SelectUserListener {
+class MainActivity : AppCompatActivity(),
+    SelectUserListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +30,9 @@ class MainActivity : AppCompatActivity(), SelectUserListener {
     }
 
     private fun checkUploading() {
-        val activeUser = intent.getIntExtra(UploadingService.CURRENT_USER_ID, DEF_USER_ID)
+        val activeUser = intent.getIntExtra(UploadService.CURRENT_USER_ID,
+            DEF_USER_ID
+        )
         if (activeUser > DEF_USER_ID) {
             selectUser(activeUser)
         }
@@ -44,8 +47,4 @@ class MainActivity : AppCompatActivity(), SelectUserListener {
             .addToBackStack(null)
             .commit()
     }
-}
-
-interface SelectUserListener {
-    fun selectUser(id: Int)
 }

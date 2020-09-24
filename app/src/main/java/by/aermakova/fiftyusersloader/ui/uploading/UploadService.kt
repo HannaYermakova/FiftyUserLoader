@@ -7,15 +7,15 @@ import android.os.Build
 import android.os.IBinder
 import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.data.UserInteractor
-import by.aermakova.fiftyusersloader.ui.DEF_USER_ID
-import by.aermakova.fiftyusersloader.ui.MainActivity
+import by.aermakova.fiftyusersloader.ui.main.DEF_USER_ID
+import by.aermakova.fiftyusersloader.ui.main.MainActivity
 import by.aermakova.fiftyusersloader.ui.user.PROGRESS_UPDATE
 import by.aermakova.fiftyusersloader.ui.user.PROGRESS_UPDATE_ACTION
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class UploadingService : Service(), UploadCondition {
+class UploadService : Service(), UploadManager {
 
     companion object {
         const val CHANNEL_ID = "ForegroundServiceChannel"
@@ -40,7 +40,9 @@ class UploadingService : Service(), UploadCondition {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val fileTitle = intent?.getStringExtra(FILE_TITLE)
-        val userId = intent?.getIntExtra(USER_ID, DEF_USER_ID)
+        val userId = intent?.getIntExtra(USER_ID,
+            DEF_USER_ID
+        )
         if (fileTitle != null && userId != null && userId > DEF_USER_ID) {
             loader = Uploader(this, userId)
             loader.startUploading(fileTitle, applicationContext)
@@ -112,10 +114,4 @@ class UploadingService : Service(), UploadCondition {
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
-}
-
-interface UploadCondition {
-    fun updateNotification(progress: Int, userId: Int)
-    fun clearNotification(userId: Int)
-    fun getInteractor(): UserInteractor
 }

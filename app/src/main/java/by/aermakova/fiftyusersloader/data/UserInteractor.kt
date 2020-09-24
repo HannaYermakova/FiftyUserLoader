@@ -9,8 +9,8 @@ import okhttp3.MultipartBody
 import javax.inject.Inject
 
 class UserInteractor @Inject constructor(
-    private var localDB: UserLocalRepository,
-    private var remoteDB: UserRemoteRepository
+    private val localDB: UserLocalRepository,
+    private val remoteDB: UserRemoteRepository
 ) {
 
     fun getUsers(refresh: Boolean): Single<List<User>> {
@@ -44,9 +44,7 @@ class UserInteractor @Inject constructor(
             }
     }
 
-    fun getUserById(currentUserId: Int) =
-        localDB.getUserById(currentUserId)
+    fun getUserById(currentUserId: Int) = localDB.getUserById(currentUserId)
 
-    fun uploadFile(file: MultipartBody.Part)
-            = remoteDB.uploadFile(file)
+    fun uploadFile(body: MultipartBody.Part) = remoteDB.uploadFile(body)
 }

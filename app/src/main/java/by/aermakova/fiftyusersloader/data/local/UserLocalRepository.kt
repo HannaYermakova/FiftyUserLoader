@@ -4,7 +4,7 @@ import by.aermakova.fiftyusersloader.data.model.local.User
 import io.reactivex.Single
 import javax.inject.Inject
 
-class UserLocalRepository @Inject constructor(private var userDao: UserDao) {
+class UserLocalRepository @Inject constructor(private val userDao: UserDao) {
 
     fun getAllUsers(): Single<List<User>> {
         return userDao.getAllUsers()

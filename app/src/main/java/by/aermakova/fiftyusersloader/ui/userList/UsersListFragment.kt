@@ -1,7 +1,6 @@
 package by.aermakova.fiftyusersloader.ui.userList
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.databinding.FragmentUserListBinding
-import by.aermakova.fiftyusersloader.ui.SelectUserListener
+import by.aermakova.fiftyusersloader.ui.main.SelectUserListener
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.CompositeDisposable
 

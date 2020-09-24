@@ -8,7 +8,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 class Uploader constructor(
-    private val condition: UploadCondition,
+    private val manager: UploadManager,
     private val userId: Int
 ) {
     private val disposable = CompositeDisposable()
@@ -21,16 +21,16 @@ class Uploader constructor(
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                        { condition.updateNotification(it.toInt(), userId) },
+                        { manager.updateNotification(it.toInt(), userId) },
                         { it.printStackTrace() }
                     )
             )
             disposable.add(
-                condition.getInteractor().uploadFile(prepareFilePart(fileTitle, body))
+                manager.getInteractor().uploadFile(prepareFilePart(fileTitle, body))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                        { condition.clearNotification(userId) },
+                        { manager.clearNotification(userId) },
                         { it.printStackTrace() }
                     )
             )

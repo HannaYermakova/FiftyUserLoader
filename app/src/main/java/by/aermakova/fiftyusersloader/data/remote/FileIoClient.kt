@@ -17,7 +17,7 @@ class FileIoClient {
             .baseUrl(FILE_IO_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-//            .client(getClient())
+            .client(getClient())
             .build()
         fileUploadApi = retrofit.create(FileUploadApi::class.java)
         return fileUploadApi
