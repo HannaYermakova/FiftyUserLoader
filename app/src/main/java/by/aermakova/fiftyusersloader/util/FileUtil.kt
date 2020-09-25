@@ -13,8 +13,8 @@ import java.io.*
 import java.net.URL
 import java.net.URLConnection
 
-const val FOLDER_NAME = "temp"
-const val FILE_FIELD = "file"
+private const val FOLDER_NAME = "temp"
+private const val FILE_FIELD = "file"
 
 fun Context.downloadFile(path: String?, fileName: String, extension: String): Boolean {
 

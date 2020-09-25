@@ -45,7 +45,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideFileIoClient(): FileIoClient {
-        return FileIoClient()
+        return FileIoClient
     }
 
     @Singleton

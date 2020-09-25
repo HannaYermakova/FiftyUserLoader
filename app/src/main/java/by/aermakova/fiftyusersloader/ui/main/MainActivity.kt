@@ -1,7 +1,9 @@
 package by.aermakova.fiftyusersloader.ui.main
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.ui.uploading.UploadService
 import by.aermakova.fiftyusersloader.ui.user.UserFragment
@@ -12,8 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 const val DEF_USER_ID = -1
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(),
-    SelectUserListener {
+class MainActivity : AppCompatActivity(), SelectUserListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +31,8 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun checkUploading() {
-        val activeUser = intent.getIntExtra(UploadService.CURRENT_USER_ID,
-            DEF_USER_ID
-        )
+        val activeUser = intent.getIntExtra(UploadService.CURRENT_USER_ID, DEF_USER_ID)
+        Log.d("A_MainActivity", "$activeUser")
         if (activeUser > DEF_USER_ID) {
             selectUser(activeUser)
         }

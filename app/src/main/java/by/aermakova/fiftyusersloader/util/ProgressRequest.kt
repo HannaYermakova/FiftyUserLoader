@@ -18,8 +18,8 @@ class ProgressRequest(
 ) : RequestBody() {
 
     companion object {
-        const val DEFAULT_BUFFER_SIZE = 2048
-        const val DEFAULT_TIME = 1
+       private const val DEFAULT_BUFFER_SIZE = 2048
+       private const val DEFAULT_TIME = 1
     }
 
     private val _progressSubject = PublishSubject.create<Float>()
@@ -30,7 +30,7 @@ class ProgressRequest(
         return context.contentResolver.getType(uri)?.toMediaTypeOrNull()
     }
 
-    var numWrite = 0
+    private var numWrite = 1
 
     override fun writeTo(sink: BufferedSink) {
         ++numWrite

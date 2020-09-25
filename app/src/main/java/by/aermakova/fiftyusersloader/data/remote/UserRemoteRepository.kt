@@ -7,7 +7,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
 import javax.inject.Inject
 
-const val INITIAL_NUMBER = 50
+private const val INITIAL_NUMBER = 50
 
 class UserRemoteRepository @Inject constructor(
     private val userGeneratorApi: UserGeneratorApi,

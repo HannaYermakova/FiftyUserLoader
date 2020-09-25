@@ -7,4 +7,5 @@
     <string name="file_uploaded">"File "%1$s" is uploaded"</string>
     <string name="file_uploading">"File "%1$s" is uploading"</string>
     <string name="error_message">"Can not load users"</string>
+    <string name="error_message_notification">"Can not upload file"</string>
 </resources>

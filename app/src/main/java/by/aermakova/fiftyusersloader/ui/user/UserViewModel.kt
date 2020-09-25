@@ -1,10 +1,9 @@
 package by.aermakova.fiftyusersloader.ui.user
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,20 +24,19 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 
-const val PROGRESS_UPDATE = "progress_update"
-const val PROGRESS_UPDATE_ACTION = "by.aermakova.fiftyusersloader.progress_update"
-
 class UserViewModel @ViewModelInject constructor(
     private val userInteractor: UserInteractor,
     private val appContext: Context
 ) :
-    ViewModel() {
+    ViewModel(), OnProgressUpdate {
+
+    private var broadcastReceiver = UploadReceiver(this)
 
     var currentUserId: Int = DEF_USER_ID
         set(value) {
             field = value
             loadUser()
-            registerReceiver()
+            broadcastReceiver.registerReceiver(appContext, value)
         }
 
     val disposable = CompositeDisposable()
@@ -59,7 +57,9 @@ class UserViewModel @ViewModelInject constructor(
     val progressSubject: Observable<Int>
         get() = _progressSubject
 
-    private var broadcastReceiver: BroadcastReceiver = UploadReceiver()
+    private var _errorMessageSubject = PublishSubject.create<String>()
+    val errorMessageSubject: Observable<String>
+        get() = _errorMessageSubject
 
     val saveFile = { downloadFile() }
 
@@ -82,8 +82,7 @@ class UserViewModel @ViewModelInject constructor(
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                             {
-                                _toastText.onNext(
-                                    appContext.getString(
+                                _toastText.onNext( appContext.getString(
                                         R.string.file_downloaded,
                                         login
                                     )
@@ -145,33 +144,22 @@ class UserViewModel @ViewModelInject constructor(
                 } else {
                     appContext.startService(intent)
                 }
-                registerReceiver()
             }
         }
     }
 
     override fun onCleared() {
-        unregisterReceiver()
+        broadcastReceiver.unregisterReceiver(appContext)
         disposable.clear()
+        Log.d("A_UserViewModel", "disposable.clear()")
         super.onCleared()
     }
 
-    inner class UploadReceiver : BroadcastReceiver() {
-
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val progress = intent?.getIntExtra(PROGRESS_UPDATE, 0) ?: 0
-            if (!disposable.isDisposed) {
-                _progressSubject.onNext(progress)
-            }
-        }
+    override fun progressUpdate(progress: Int) {
+        _progressSubject.onNext(progress)
     }
 
-    private fun registerReceiver() {
-        val filter = IntentFilter("$PROGRESS_UPDATE_ACTION$currentUserId")
-        appContext.registerReceiver(broadcastReceiver, filter)
-    }
-
-    private fun unregisterReceiver() {
-        appContext.unregisterReceiver(broadcastReceiver)
+    override fun showErrorMessage() {
+        _errorMessageSubject.onNext(appContext.resources.getString(R.string.error_message_notification))
     }
 }

@@ -12,7 +12,7 @@ import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.databinding.FragmentUserBinding
 import by.aermakova.fiftyusersloader.ui.main.DEF_USER_ID
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.disposables.Disposables
+import io.reactivex.disposables.CompositeDisposable
 
 @AndroidEntryPoint
 class UserFragment : Fragment() {
@@ -23,7 +23,7 @@ class UserFragment : Fragment() {
 
     private val viewModel: UserViewModel by viewModels()
     private lateinit var binding: FragmentUserBinding
-    private var disposable = Disposables.empty()
+    private var disposable = CompositeDisposable()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,29 +38,30 @@ class UserFragment : Fragment() {
     }
 
     private fun setUser() {
-        val id = arguments?.getInt(SELECTED_USER,
-            DEF_USER_ID
-        ) ?: DEF_USER_ID
+        val id = arguments?.getInt(SELECTED_USER, DEF_USER_ID) ?: DEF_USER_ID
         if (id > DEF_USER_ID) {
             viewModel.currentUserId = id
         }
     }
 
     private fun setToasts() {
-        disposable = viewModel.toastText.subscribe({
-            Toast.makeText(
-                requireContext(),
-                it,
-                Toast.LENGTH_SHORT
+        disposable.add(viewModel.toastText.subscribe(
+                { Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show() },
+                { it.printStackTrace() }
             )
-                .show()
-        },
-            { it.printStackTrace() }
+        )
+        disposable.add(viewModel.errorMessageSubject.subscribe(
+                {
+                    Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                    binding.progressUploading.visibility = View.GONE
+                },
+                { it.printStackTrace() }
+            )
         )
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        disposable.dispose()
+        disposable.clear()
     }
 }

@@ -224,8 +224,7 @@ object BindingAdapter {
             disposable.add(
                 uploading.subscribe(
                     {
-                        progressBar.visibility = if (it in 1..99) View.VISIBLE
-                        else View.GONE
+                        progressBar.visibility = if (it in 1..99) View.VISIBLE else View.GONE
                         progressBar.progress = it.toInt()
                     },
                     { it.printStackTrace() }

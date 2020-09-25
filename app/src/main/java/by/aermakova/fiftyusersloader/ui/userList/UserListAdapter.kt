@@ -8,11 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import by.aermakova.fiftyusersloader.R
 import by.aermakova.fiftyusersloader.data.model.local.User
 import by.aermakova.fiftyusersloader.databinding.UserItemBinding
-import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 class UserListAdapter(
@@ -24,7 +22,7 @@ class UserListAdapter(
     private val usersList = arrayListOf<User>()
 
     fun update(items: List<User>) {
-       disposable.add(
+        disposable.add(
             Single.create<DiffUtil.DiffResult> {
                 val diffResult = DiffUtil.calculateDiff(
                     UserDiffUtil(usersList, items)
@@ -44,7 +42,8 @@ class UserListAdapter(
                         it.printStackTrace()
                         setData(items)
                         notifyDataSetChanged()
-                    })
+                    }
+                )
         )
     }
 

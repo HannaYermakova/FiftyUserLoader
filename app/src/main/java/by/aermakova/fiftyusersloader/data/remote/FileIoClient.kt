@@ -6,21 +6,18 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
-const val FILE_IO_URL = "https://file.io"
+private const val FILE_IO_URL = "https://file.io"
 
-class FileIoClient {
-
-    private lateinit var fileUploadApi: FileUploadApi
+object FileIoClient {
 
     fun getFileUploadApi(): FileUploadApi {
         val retrofit = Retrofit.Builder()
             .baseUrl(FILE_IO_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .client(getClient())
+//            .client(getClient())
             .build()
-        fileUploadApi = retrofit.create(FileUploadApi::class.java)
-        return fileUploadApi
+        return retrofit.create(FileUploadApi::class.java)
     }
 
     private fun getClient(): OkHttpClient {

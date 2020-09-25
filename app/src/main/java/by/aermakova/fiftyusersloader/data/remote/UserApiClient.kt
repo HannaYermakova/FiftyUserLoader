@@ -5,7 +5,6 @@ import by.aermakova.fiftyusersloader.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
-import okhttp3.logging.HttpLoggingInterceptor
 import okio.Buffer
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -16,8 +15,6 @@ import java.nio.charset.StandardCharsets
 
 class UserApiClient {
 
-    private lateinit var userApiService: UserGeneratorApi
-
     fun getUserApiService(): UserGeneratorApi {
         val retrofit = Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
@@ -25,8 +22,7 @@ class UserApiClient {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .client(getClient())
             .build()
-        userApiService = retrofit.create(UserGeneratorApi::class.java)
-        return userApiService
+        return retrofit.create(UserGeneratorApi::class.java)
     }
 
     private fun getClient(): OkHttpClient {
